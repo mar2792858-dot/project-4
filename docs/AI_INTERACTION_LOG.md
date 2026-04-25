@@ -19,3 +19,16 @@ empty bag or items that are not present and maintains the bag and its size.
 Fourth: "Yes, lets continue with tests for contains(). Try not to duplicate functionality that has been completed with previous tests."
 
 I reviewed the tests again and they looked good and did not duplicate functionality. Handles, null values well.
+
+At the end of the response it asked to continue with tests for isEmpty() and I agreed.
+The tests for isEmpty() also looked good. 
+
+Next prompt: "Yes please continue with iterator() tests. Please include tests that verify Iterator hasNext() works correctly and
+Iterator next() works correctly."
+
+The tests for Iterator look good and included the specified requirements that I asked for.
+
+Final prompt: "Can you review the BagTest.java, are there any additional edge cases you would consider including?"
+
+Added first two suggestions, one that handles duplicate-heavy lists and removes the first matching element and verifies iteration order.
+The second one I added handles null element traversal in an iterator() test, ensures correct return of null if it is a stored element.

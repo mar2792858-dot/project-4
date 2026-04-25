@@ -3,12 +3,15 @@ package com.example.iterable;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for Bag behavior, including add(), remove(), contains(), edge cases, and iteration effects.
+ * Tests for Bag behavior, including add(), remove(), contains(), size(), isEmpty(), edge cases, and iteration effects.
  */
 public class BagTest {
 
@@ -228,5 +231,182 @@ public class BagTest {
         bag.remove(null);
 
         assertFalse(bag.contains(null));
+    }
+
+    /**
+     * Verifies that a newly created bag reports a size of zero.
+     */
+    @Test
+    void sizeReturnsZeroForNewBag() {
+        Bag<String> bag = new Bag<>();
+
+        assertEquals(0, bag.size());
+    }
+
+    /**
+     * Verifies that size updates correctly across a sequence of adds and removes.
+     */
+    @Test
+    void sizeTracksMixedAddAndRemoveOperations() {
+        Bag<String> bag = new Bag<>();
+
+        bag.add("apple");
+        bag.add("banana");
+        bag.add("pear");
+        assertEquals(3, bag.size());
+
+        bag.remove("banana");
+        assertEquals(2, bag.size());
+
+        bag.remove("apple");
+        assertEquals(1, bag.size());
+
+        bag.remove("pear");
+        assertEquals(0, bag.size());
+    }
+
+    /**
+     * Verifies that size counts every stored entry, including null values and duplicates.
+     */
+    @Test
+    void sizeCountsNullAndDuplicateEntries() {
+        Bag<String> bag = new Bag<>();
+
+        bag.add(null);
+        bag.add("book");
+        bag.add("book");
+
+        assertEquals(3, bag.size());
+    }
+
+    /**
+     * Verifies that isEmpty returns true for a newly created bag.
+     */
+    @Test
+    void isEmptyReturnsTrueForNewBag() {
+        Bag<String> bag = new Bag<>();
+
+        assertTrue(bag.isEmpty());
+    }
+
+    /**
+     * Verifies that isEmpty returns false after at least one item is added.
+     */
+    @Test
+    void isEmptyReturnsFalseAfterAddingItem() {
+        Bag<String> bag = new Bag<>();
+        bag.add("apple");
+
+        assertFalse(bag.isEmpty());
+    }
+
+    /**
+     * Verifies that isEmpty returns true again after removing the last remaining item.
+     */
+    @Test
+    void isEmptyReturnsTrueAfterRemovingLastItem() {
+        Bag<String> bag = new Bag<>();
+        bag.add("apple");
+
+        bag.remove("apple");
+
+        assertTrue(bag.isEmpty());
+    }
+
+    /**
+     * Verifies that an iterator from an empty bag reports no next element.
+     */
+    @Test
+    void iteratorHasNextReturnsFalseForEmptyBag() {
+        Bag<String> bag = new Bag<>();
+        Iterator<String> iterator = bag.iterator();
+
+        assertFalse(iterator.hasNext());
+    }
+
+    /**
+     * Verifies that calling next on an empty iterator throws NoSuchElementException.
+     */
+    @Test
+    void iteratorNextThrowsWhenBagIsEmpty() {
+        Bag<String> bag = new Bag<>();
+        Iterator<String> iterator = bag.iterator();
+
+        assertThrows(NoSuchElementException.class, iterator::next);
+    }
+
+    /**
+     * Verifies that hasNext transitions from true to false as elements are consumed.
+     */
+    @Test
+    void iteratorHasNextTracksRemainingElements() {
+        Bag<String> bag = new Bag<>();
+        bag.add("A");
+        bag.add("B");
+
+        Iterator<String> iterator = bag.iterator();
+
+        assertTrue(iterator.hasNext());
+        iterator.next();
+        assertTrue(iterator.hasNext());
+        iterator.next();
+        assertFalse(iterator.hasNext());
+    }
+
+    /**
+     * Verifies that next returns elements in insertion order and throws when exhausted.
+     */
+    @Test
+    void iteratorNextReturnsElementsInOrderAndThrowsWhenExhausted() {
+        Bag<String> bag = new Bag<>();
+        bag.add("A");
+        bag.add("B");
+        bag.add("C");
+
+        Iterator<String> iterator = bag.iterator();
+
+        assertEquals("A", iterator.next());
+        assertEquals("B", iterator.next());
+        assertEquals("C", iterator.next());
+        assertThrows(NoSuchElementException.class, iterator::next);
+    }
+
+    /**
+     * Verifies ArrayList-style remove semantics by removing only the first matching duplicate and preserving order.
+     */
+    @Test
+    void removeDuplicateRemovesFirstMatchAndPreservesOrder() {
+        Bag<String> bag = new Bag<>();
+        bag.add("A");
+        bag.add("X");
+        bag.add("B");
+        bag.add("X");
+        bag.add("C");
+
+        boolean removed = bag.remove("X");
+
+        List<String> iteratedItems = new ArrayList<>();
+        for (String item : bag) {
+            iteratedItems.add(item);
+        }
+
+        assertTrue(removed);
+        assertEquals(4, bag.size());
+        assertEquals(List.of("A", "B", "X", "C"), iteratedItems);
+    }
+
+    /**
+     * Verifies ArrayList iterator fail-fast behavior after a structural modification.
+     */
+    @Test
+    void iteratorThrowsConcurrentModificationExceptionAfterStructuralChange() {
+        Bag<String> bag = new Bag<>();
+        bag.add("A");
+        bag.add("B");
+
+        Iterator<String> iterator = bag.iterator();
+        bag.add("C");
+
+        assertThrows(ConcurrentModificationException.class, iterator::next);
     }
 }
