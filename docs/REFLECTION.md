@@ -10,3 +10,7 @@ values that are elements. I reflect on how datasets I have worked with
 in the past have had null values and how they count them and are considered. It
 was interesting to see this use in Java in comparison to how it looks in the Numpy or Pandas 
 libraries, very similar. 
+
+The only thing I was not sure about was how reasonable the test method
+names were. They seemed long, but descriptive. I definitely would not have
+wanted method names that were that long in the actual implementation.
